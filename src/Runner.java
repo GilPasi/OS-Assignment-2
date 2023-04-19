@@ -5,18 +5,18 @@
 public class Runner {
 
 	public static void main(String[] args) {
-		Cow c1 = new Cow();
-		Cow c2 = new Cow();
-		Cow c3 = new Cow();
-		Cow c4 = new Cow();
-		Cow c5 = new Cow();
-		Cow c6 = new Cow();
-		Cow c7 = new Cow();
-		Cow c8 = new Cow();
-		Cow c9 = new Cow();
-		Cow c10 = new Cow();
-		Cow c11 = new Cow();
-		Cow c12 = new Cow();
+		CowThread c1 = new CowThread();
+		CowThread c2 = new CowThread();
+		CowThread c3 = new CowThread();
+		CowThread c4 = new CowThread();
+		CowThread c5 = new CowThread();
+		CowThread c6 = new CowThread();
+		CowThread c7 = new CowThread();
+		CowThread c8 = new CowThread();
+		CowThread c9 = new CowThread();
+		CowThread c10 = new CowThread();
+		CowThread c11 = new CowThread();
+		CowThread c12 = new CowThread();
 
 		c1.start();
 		c2.start();

@@ -5,12 +5,18 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
-import java.util.concurrent.Semaphore;
 
 public class Compounds {
 	
+	//Shared properties
 	SharedResources res = new SharedResources();
 	static final int DEFAULT_TICKETS = 10;
+	
+	//Areas
+	HayArea ha;
+	WaterArea wa;
+	StrayArea sa;
+
 
 	
 	/**
@@ -26,7 +32,7 @@ public class Compounds {
 	
 
 	
-	public void addCow () {
+	public void appendCow () {
 		res.cowshed.release();
 		
 		
@@ -35,47 +41,34 @@ public class Compounds {
 			res.setTickets(new ArrayList<>(Collections.nCopies(3,DEFAULT_TICKETS)));
 		//Fill all 3 cells with the DEFUALT_TICKETS value	
 	
-		;}
-	
-	
-	public  void treat (int id ) {
-		
-		try {
-        	eat(id);//Demand (4) - drink after eating
-        	drink(id);
-        	walk(id);
-        	
-		} catch (InterruptedException e) {
-			System.err.println("Cow " + id + " was interrupted" );
-			e.printStackTrace();
-		}
 	}
 	
 	
-	public synchronized void eat(int id) throws InterruptedException {
-		res.haySem.acquire();
+	public synchronized void eat(CowThread cow) throws InterruptedException {
+		res.enterArea("hay", cow);
 		res.cowshed.acquire();//Cow is now occupied
     	
-		System.out.println("Cow " + id + " is eating");
+		System.out.println("Cow " + cow.ID + " is eating");
 		randomSleep();
 		
-		res.waterSem.acquire();/*Implicit demand: The cow 
+		res.enterArea("water", cow);;/*Implicit demand: The cow 
 							drinks only when it is done eating. */
-		res.haySem.release();
+		res.leaveArea("hay", cow);
 
 	}
+
 	
-	public synchronized void drink(int id) throws InterruptedException {
+	public synchronized void drink(CowThread cow) throws InterruptedException {
 		
-		System.out.println("Cow " + id + " is drinking");
+		System.out.println("Cow " + cow.ID + " is drinking");
 		randomSleep();
 		
-		res.waterSem.release();
+		res.leaveArea("water", cow);
     	notifyAll();
 		
 	}	
 	
-	public synchronized void walk(int id) throws InterruptedException {
+	public synchronized void walk(CowThread cow) throws InterruptedException {
 		
 		/**This method let the cow walk only when all of its peers 
 		 * are done eating and drinking.
@@ -98,26 +91,18 @@ public class Compounds {
     		System.out.println("Culprit! a cow tries to walk before all other cows are ready");
     		wait();//Demand (3) - wait for all the cows    		
     	}       		
-		
-		System.out.println("Cow " + id + " is walking");
+		res.enterArea("walk", cow);
+		System.out.println("Cow " + cow.ID + " is walking");
 		randomSleep();
-		
-		
 	}
 	
 	
 	
 	private void randomSleep() throws InterruptedException {
         Random random = new Random();
-        final int MIN = 1;
-        final int MAX = 1;
+        final int MIN = 2;
+        final int MAX = 10;
         int sleepTime = random.nextInt(MAX - MIN + 1) + MIN; //Demand (5)-random waiting in the range 2-10 
-        Thread.sleep(sleepTime * 1000);
-
-		
+        Thread.sleep(sleepTime * 1000);		
 	}
-	
-	
-
-
 }
